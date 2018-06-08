@@ -1,4 +1,5 @@
-
+	
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -6,13 +7,17 @@ import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.khelacademy.www.pojos.EventPrice;
+import com.cloudinary.*;
+import com.cloudinary.Util.*;
+import com.cloudinary.utils.ObjectUtils;
+
 //apache poi imports
 
 public class EventsFromXLS{
@@ -26,13 +31,13 @@ public class EventsFromXLS{
 			
 			
 			
-			
-			
+			Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+					  "cloud_name", "-",
+					  "api_key", "",
+					  "api_secret", "-"));
+			File toUpload = null;
+			Map uploadResult = null;
 			DBArrow SQLArrow = DBArrow.getArrow();
-			
-			
-			
-			EventPrice prices = new EventPrice();
 			
 			
 			
@@ -56,6 +61,7 @@ public class EventsFromXLS{
 			
 	        try {
 	            boolean xxx = false;
+	            StringBuffer imageName = null;
 	            String ID = "XX";
 				Row R = null;
 				int ii=0;
@@ -85,7 +91,7 @@ public class EventsFromXLS{
 						ID = R.getCell(0).toString();
 					}else{
 						ID = R.getCell(0).toString();
-						PreparedStatement statement = SQLArrow.getPreparedStatement("INSERT INTO event  (event_type, eventdate, status, description,venue,event_name,timings,creation_date,event_city,max_participants ) values (?, ?, ?, ?, ?, ?, ?,NOW(),?,?)");
+						PreparedStatement statement = SQLArrow.getPreparedStatement("INSERT INTO event  (event_type, eventdate, status, description,venue,event_name,timings,creation_date,event_city,max_participants, event_city_id, img_url ) values (?, ?, ?, ?, ?, ?, ?,NOW(),?, ?, ?,?)");
 		                statement.setInt(1, 1);
 		                statement.setString(2, R.getCell(4).toString());
 		                statement.setInt(3, 1);
@@ -95,6 +101,17 @@ public class EventsFromXLS{
 		                statement.setString(7, R.getCell(7).toString());
 		                statement.setString(8, R.getCell(6).toString());
 		                statement.setString(9, R.getCell(2).toString());
+		                
+		                if(R.getCell(2).toString().equalsIgnoreCase("delhi"))
+		                	statement.setInt(10, 1);
+		                else
+		                	statement.setInt(10, 0);
+		                
+		                toUpload = new File("/Users/mac/Downloads/"+R.getCell(11).toString());
+		    			uploadResult = cloudinary.uploader().upload(toUpload, ObjectUtils.emptyMap());
+		                
+		                statement.setString(11, uploadResult.get("secure_url").toString());
+		                System.out.println(statement.toString());
 		                if(SQLArrow.fireBowfishing(statement) == 1){
 		                	System.out.println("yo  its done");
 		                }
