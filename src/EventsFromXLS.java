@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map;
@@ -32,9 +33,9 @@ public class EventsFromXLS{
 			
 			
 			Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
-					  "cloud_name", "-",
-					  "api_key", "",
-					  "api_secret", "-"));
+					  "cloud_name", "parc-india",
+					  "api_key", "854955239716411",
+					  "api_secret", "DC0DhKwPyP6ZP-GlzqS6MZILgm0"));
 			File toUpload = null;
 			Map uploadResult = null;
 			DBArrow SQLArrow = DBArrow.getArrow();
@@ -61,37 +62,51 @@ public class EventsFromXLS{
 			
 	        try {
 	            boolean xxx = false;
-	            StringBuffer imageName = null;
 	            String ID = "XX";
 				Row R = null;
 				int ii=0;
+				int eventId = 0;
 				Iterator<Row> rowIterator = sheet1.iterator();
 				while(rowIterator.hasNext()){
 					R=rowIterator.next();
-					
-					System.out.println(R.getCell(0) + "0");
-					System.out.println(R.getCell(1)+ "1");
-					System.out.println(R.getCell(2)+ "2");
-					System.out.println(R.getCell(3)+ "3");
-					System.out.println(R.getCell(4)+ "4");
-					System.out.println(R.getCell(5)+ "5");
-					System.out.println(R.getCell(6)+ "6");
-					System.out.println(R.getCell(7)+ "7");
-					System.out.println(R.getCell(8)+ "8");
-					System.out.println(R.getCell(9)+ "9");
-					System.out.println(R.getCell(10)+ "10");
 
-					System.out.println("Done Row");
+//					System.out.println(R.getCell(0) + "0");
+//					System.out.println(R.getCell(1)+ "1");
+//					System.out.println(R.getCell(2)+ "2");
+//					System.out.println(R.getCell(3)+ "3");
+//					System.out.println(R.getCell(4)+ "4");
+//					System.out.println(R.getCell(5)+ "5");
+//					System.out.println(R.getCell(6)+ "6");
+//					System.out.println(R.getCell(7)+ "7");
+//					System.out.println(R.getCell(8)+ "8");
+//					System.out.println(R.getCell(9)+ "9");
+//					System.out.println(R.getCell(10)+ "10");
+//
+//					System.out.println("Done Row");
 					if(R.getCell(0).toString().equals("id")){
 						ii++;
 						continue;
 					}
+					System.out.println("INSERTING ROW NUMBER"+ ii);
 					if(ID.equals(R.getCell(0).toString())){
-						System.out.println("SKIPPING THIS");
+						System.out.println("SKIPPING THE SAME EVENT ROW BUT INSERTING IN PRICE TABLES");
+		                if(eventId > 0) {
+		                	PreparedStatement statement = SQLArrow.getPreparedStatement("INSERT INTO price  (event_id, price_currency, price_amount, description,price_name,category_id ) values (?, ?, ?, ?, ?, ?)");
+		                	statement.setInt(1, eventId);
+		                	statement.setString(2, "INR");
+		                	statement.setInt(3, Integer.parseInt(R.getCell(9).toString().trim().substring(0, R.getCell(9).toString().trim().length()-2)));
+		                	statement.setString(4, R.getCell(13).toString());
+		                	statement.setString(5, R.getCell(10).toString());
+		                	statement.setString(6, R.getCell(12).toString());
+			                if(SQLArrow.fireBowfishing(statement) == 1){
+			                	System.out.println("INSERTED PRICE FOR ROW NUMBER"+ ii);
+			                }
+		                }
+						
 						ID = R.getCell(0).toString();
 					}else{
 						ID = R.getCell(0).toString();
-						PreparedStatement statement = SQLArrow.getPreparedStatement("INSERT INTO event  (event_type, eventdate, status, description,venue,event_name,timings,creation_date,event_city,max_participants, event_city_id, img_url ) values (?, ?, ?, ?, ?, ?, ?,NOW(),?, ?, ?,?)");
+						PreparedStatement statement = SQLArrow.getPreparedStatementForId("INSERT INTO event  (event_type, eventdate, status, description,venue,event_name,timings,creation_date,event_city,max_participants, event_city_id, img_url ) values (?, ?, ?, ?, ?, ?, ?,NOW(),?, ?, ?,?)");
 		                statement.setInt(1, 1);
 		                statement.setString(2, R.getCell(4).toString());
 		                statement.setInt(3, 1);
@@ -113,10 +128,28 @@ public class EventsFromXLS{
 		                statement.setString(11, uploadResult.get("secure_url").toString());
 		                System.out.println(statement.toString());
 		                if(SQLArrow.fireBowfishing(statement) == 1){
-		                	System.out.println("yo  its done");
+		                	System.out.println("INSERTED ROW NUMBER"+ ii);
+			                ResultSet rs = statement.getGeneratedKeys();
+			                if(rs.next())
+			                {
+			                	eventId = rs.getInt(1);
+			                }
+			                if(eventId > 0) {
+			                	statement = SQLArrow.getPreparedStatement("INSERT INTO price  (event_id, price_currency, price_amount, description,price_name,category_id ) values (?, ?, ?, ?, ?, ?)");
+			                	statement.setInt(1, eventId);
+			                	statement.setString(2, "INR");
+			                	statement.setInt(3, Integer.parseInt(R.getCell(9).toString().trim().substring(0, R.getCell(9).toString().trim().length()-2)));
+			                	statement.setString(4, R.getCell(13).toString());
+			                	statement.setString(5, R.getCell(10).toString());
+			                	statement.setString(6, R.getCell(12).toString());
+				                if(SQLArrow.fireBowfishing(statement) == 1){
+				                	System.out.println("INSERTED PRICE FOR ROW NUMBER"+ ii);
+				                }
+			                }
 		                }
+
 					}
-				
+					ii++;
 //		            bufferedWriter.write((R.getCell(0).toString().trim().substring(0, R.getCell(0).toString().trim().length()-2)));
 //		            bufferedWriter.newLine();
 //					System.out.println(R.getCell(0).toString().substring(0, R.getCell(0).toString().length()-2));
@@ -126,6 +159,7 @@ public class EventsFromXLS{
 	            
 	        } catch (Exception e) {
 	            e.printStackTrace();
+	            SQLArrow.rollBack(null);
 	        }
 			
 		
