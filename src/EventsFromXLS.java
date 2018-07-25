@@ -34,8 +34,8 @@ public class EventsFromXLS{
 			
 			Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
 					  "cloud_name", "parc-india",
-					  "api_key", "854955239716411",
-					  "api_secret", "DC0DhKwPyP6ZP-GlzqS6MZILgm0"));
+					  "api_key", "137447452869923",
+					  "api_secret", "tynQQxYZEajwczLluFbYuAYXUAo"));
 			File toUpload = null;
 			Map uploadResult = null;
 			DBArrow SQLArrow = DBArrow.getArrow();
@@ -106,7 +106,7 @@ public class EventsFromXLS{
 						ID = R.getCell(0).toString();
 					}else{
 						ID = R.getCell(0).toString();
-						PreparedStatement statement = SQLArrow.getPreparedStatementForId("INSERT INTO event  (event_type, eventdate, status, description,venue,event_name,timings,creation_date,event_city,max_participants, event_city_id, img_url ) values (?, ?, ?, ?, ?, ?, ?,NOW(),?, ?, ?,?)");
+						PreparedStatement statement = SQLArrow.getPreparedStatementForId("INSERT INTO event  (event_type, eventdate, status, description,venue,event_name,timings,creation_date,event_city,max_participants, event_city_id, img_url, start_price ) values (?, ?, ?, ?, ?, ?, ?,NOW(),?, ?, ?,?,99)");
 		                statement.setInt(1, 1);
 		                statement.setString(2, R.getCell(4).toString());
 		                statement.setInt(3, 1);
@@ -116,11 +116,10 @@ public class EventsFromXLS{
 		                statement.setString(7, R.getCell(7).toString());
 		                statement.setString(8, R.getCell(6).toString());
 		                statement.setString(9, R.getCell(2).toString());
-		                
-		                if(R.getCell(2).toString().equalsIgnoreCase("delhi"))
-		                	statement.setInt(10, 1);
-		                else
-		                	statement.setInt(10, 0);
+		                //if(R.getCell(2).toString().equalsIgnoreCase("delhi"))
+		                	statement.setInt(10, new Integer(R.getCell(6).toString().substring(0,1)));
+		                //else
+		                	//statement.setInt(10, 0);
 		                
 		                toUpload = new File("/Users/mac/Downloads/"+R.getCell(11).toString());
 		    			uploadResult = cloudinary.uploader().upload(toUpload, ObjectUtils.emptyMap());
