@@ -11,7 +11,7 @@ public class RedisBullet {
 	public static Jedis getPool() {
 		  URI redisURI = null;
 		try {
-			redisURI = new URI("LOL");
+			redisURI = new URI("");
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

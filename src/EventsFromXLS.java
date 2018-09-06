@@ -44,8 +44,8 @@ public class EventsFromXLS{
         	
 			Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
 					  "cloud_name", "parc-india",
-					  "api_key", "137447452869923",
-					  "api_secret", "tynQQxYZEajwczLluFbYuAYXUAo"));
+					  "api_key", "",
+					  "api_secret", ""));
 			
 			
 			
@@ -209,7 +209,7 @@ public class EventsFromXLS{
 			        jedis.del(s);
 			    }
 				statement1 = SQLArrow.getPreparedStatement("select event_type from EVENT GROUP BY event_type");
-				
+				jedis.set("ACTIVE_GAMES_81","All");
 		        try (ResultSet rs = SQLArrow.fire(statement1)) {
 		        	while (rs.next()) {
 		        		jedis.set("ACTIVE_GAMES_"+Integer.toString(rs.getInt("event_type")),games.get(rs.getInt("event_type")));
@@ -221,7 +221,7 @@ public class EventsFromXLS{
 		        }
 				
 				statement1 = SQLArrow.getPreparedStatement("select event_city_id from EVENT GROUP BY event_city_id");
-				
+				jedis.set("ACTIVE_CITIES_1","All Cities");
 		        try (ResultSet rs = SQLArrow.fire(statement1)) {
 		        	while (rs.next()) {
 		        		System.out.println(cities.get(rs.getInt("event_city_id")) + "My_IDDDD");
@@ -235,6 +235,7 @@ public class EventsFromXLS{
 				SQLArrow.relax(null);
 				
 				jedis.close();
+				is.close();
 	            
 	        } catch (Exception e) {
 	            e.printStackTrace();
