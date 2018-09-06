@@ -7,16 +7,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import com.mysql.jdbc.Statement;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 
 public class DBArrow {
-	private static final Logger LOGGER = LoggerFactory.getLogger(DBArrow.class);
-    private static final String dbUser="root";
-	private static final String dbHost="localhost";
-    private static final String dbName="caper";
-    private static final String dbPass="Wsquare";
+	//private static final Logger LOGGER = LoggerFactory.getLogger(DBArrow.class);
+    private static final String dbUser="";
+	private static final String dbHost="";
+    private static final String dbName="";
+    private static final String dbPass="";
 	
     private static  DBArrow dbArrow;
 
@@ -47,7 +47,7 @@ public class DBArrow {
             dbConnection.setAutoCommit(false);
             return dbConnection.prepareStatement(s);
         } catch (SQLException e) {
-        	LOGGER.error("ERROR WHILE GETTING PREPARED STATEMENT :" + e.getMessage());
+        	//LOGGER.error("ERROR WHILE GETTING PREPARED STATEMENT :" + e.getMessage());
         }
         return null;
     }
@@ -57,7 +57,7 @@ public class DBArrow {
             dbConnection.setAutoCommit(false);
             return dbConnection.prepareStatement(s, Statement.RETURN_GENERATED_KEYS);
         } catch (SQLException e) {
-        	LOGGER.error("ERROR WHILE GETTING PREPARED STATEMENT :" + e.getMessage());
+        	//LOGGER.error("ERROR WHILE GETTING PREPARED STATEMENT :" + e.getMessage());
         }
         return null;
     }
@@ -65,7 +65,7 @@ public class DBArrow {
         try {
             rs = statement.executeQuery();
         } catch (SQLException e) {
-        	LOGGER.error("ERROR WHILE FIRING PREPARED STATEMENT :" + e.getMessage());
+        	//LOGGER.error("ERROR WHILE FIRING PREPARED STATEMENT :" + e.getMessage());
         }
         return rs;
     }
@@ -73,13 +73,15 @@ public class DBArrow {
         try {
             return statement.executeUpdate();
         } catch (SQLException e) {
-        	LOGGER.error("ERROR WHILE FIRING BOWFISHING FOR PREPARED STATEMENT :" + e.getMessage());
+        	System.out.println(e.getMessage());
+        	//LOGGER.error("ERROR WHILE FIRING BOWFISHING FOR PREPARED STATEMENT :" + e.getMessage());
         }
         return 0;
     }
 
     public void relax(ResultSet rs) throws SQLException {
     	dbConnection.commit();
+    	System.out.println("closing");
         dbConnection.close();
         dbConnection = null;
         if (preparedStatement != null)
